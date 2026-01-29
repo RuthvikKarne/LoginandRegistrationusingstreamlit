@@ -44,8 +44,7 @@ else:
 #st.video("video.mp4")
 st.divider()
 if st.checkbox('i agree '):
-    st.write("you agreed for video")
-    st.video("video.mp4")
+    st.write("you agreed ")
 option=st.radio("radio",("Male","Female","others"))
 if option=="Male":
     st.write("you are male")
@@ -97,13 +96,22 @@ if container.button("click"):
     container.write("u clicked")
 st.divider()
 
-'''data = {
+data = {
     'Name': ['Anurag', 'Sumit', 'Rohit'],
     'Age': [21, 22, 20],
     'Course': ['B.Tech', 'M.Tech', 'BBA']
 }
 st.table(data)
- '''
-st.sidebar.header("this is sidebar")
-option=st.sidebar.selectbox("choose page",["page1","page2","page3"])
-st.sidebar.write("selected",option)
+
+st.sidebar.title("Menu")
+option = st.sidebar.selectbox(
+"Choose page",
+["page1", "page2"]
+)
+st.sidebar.write(f"You selected: {option}")
+
+@st.cache_data
+def load_data():
+    return [1,2,3,4]
+data=load_data()
+st.write(data)
