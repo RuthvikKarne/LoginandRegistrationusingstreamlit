@@ -57,7 +57,7 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # Database configuration
-DB_HOST = "40.0.52.238"
+DB_HOST = "localhost"
 DB_USER = "root"
 DB_PASSWORD = "Ruthvik2006"
 DB_NAME = "Student_db"
