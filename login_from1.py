@@ -1,609 +1,109 @@
 import streamlit as st
-import mysql.connector
-from mysql.connector import Error
-import re
-import time
-from datetime import datetime
 
-# Page configuration
-st.set_page_config(
-    page_title="User Authentication System",
-    page_icon="🔐",
-    layout="centered",
-    initial_sidebar_state="collapsed"
-)
+st.header("Au student application")
+st.title("student crud application")
+st.subheader("all the crud application")
+st.markdown("=======================================================")
+st.text("shows the plain text")
+st.write("*this is used to write can be added with condition as if else*") #* * for italian and ** ** for bold text 
+st.caption("caption")
+st.markdown("-- markdown --")
+st.markdown("**name** for bold text")
+st.markdown("*name* for italian text")
+st.markdown("~~name~~ for strikethrough text")
+st.markdown("* item1 \n * item2 \n * item3") # * indicates bullet points
+st.markdown("<ol style='color:red'><li>item 1</li><li>item 2</li></ol>", unsafe_allow_html=True) # for unordered list
+st.caption('python code snippet')
+st.badge("New")
+st.code("def name():" \
+" \n print('hello world')") # to show code snippets
+st.code('''for i in range(5): \n print(i)', language='python') # code with language specified''',language='python')
+st.latex(r''' sin^2 x + cos^2 x =1''')
+st.divider()
+st.html("<h3 style='color:green'>this is h3</h3>")
+'''if st.button('click me '):
+    st.write('button is clicked ')
+    #st.spinner()
+    st.snow()
+    st.balloons()
+    st.success("this is success message")
+else:
+    st.write('buton not clickeed')
+    st.error("this is an error message")
+'''
+st.divider()
+a=st.text_input("enter ur name")
+if a == '':
+    st.write("empty")
+elif a.isalpha():
+    st.write("correct name",a)
+    st.toast("welcome "+a)
+else:
+    st.error("invalid name")
+#st.image("data:image/jpeg;base64,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")
+#st.video("video.mp4")
+st.divider()
+if st.checkbox('i agree '):
+    st.write("you agreed for video")
+    st.video("video.mp4")
+option=st.radio("radio",("Male","Female","others"))
+if option=="Male":
+    st.write("you are male")
+elif option=="Female":
+    st.write("you are female")
+elif option=="others":
+    st.write("you are others")
+    #st.image("download.jpg")
 
-# Custom CSS for styling and animations
-st.markdown("""
-    <style>
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0px);
-        }
-    }
-    
-    @keyframes slideIn {
-        from {
-            transform: translateX(-20px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0px);
-            opacity: 1;
-        }
-    }
-    
-    .main-container {
-        animation: fadeIn 0.8s ease-in-out;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 40px;
-        border-radius: 15px;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    }
-    
-    .success-message {
-        animation: slideIn 0.6s ease-in-out;
-    }
-    
-    .form-container {
-        animation: fadeIn 1s ease-in-out;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+st.divider()
+residence= st.multiselect("Select residence", ["hyderabad", "banglore", "UPPAL", "dubai"])
+age=st.slider("select ur age",1,100)
+st.write("your age is ",age)
+st.divider()
+uploaded_file=st.file_uploader("upload file",type=["png","jpg","jpeg"])
+if uploaded_file is None:
+    st.write("file is not uploaded")
+st.divider()
+with st.form("my-form"):
+    name=st.text_input("name")
+    age=st.number_input("age",1,100)
+    submit=st.form_submit_button("submit")
+if submit:
+    st.write(name , age)
+with st.form("login"):
+    name=st.text_input("name")
+    password=st.text_input("password",type="password")
+    login=st.form_submit_button("login")
+if login:
+    st.success("login succesful")
+st.divider()
 
-# Database configuration
-DB_HOST = "localhost"
-DB_USER = "root"
-DB_PASSWORD = "Ruthvik2006"
-DB_NAME = "Student_db"
+#column method to create columns 
+col1,col2,col3=st.columns(3)
+with col1:
+    st.header("column 1")
+    st.write("column 1")
+with col2:
+    st.header("column 2")
+    st.write("column 2")
+with col3:
+    st.header("column 3")
+    st.write("column 3")
+st.divider()
 
-# Initialize session state
-if 'logged_in' not in st.session_state:
-    st.session_state.logged_in = False
-if 'username' not in st.session_state:
-    st.session_state.username = None
-if 'auth_mode' not in st.session_state:
-    st.session_state.auth_mode = 'login'
+container=st.container()
+container.write("this is container")
+if container.button("click"):
+    container.write("u clicked")
+st.divider()
 
-# Database Functions
-def get_db_connection():
-    """Create database connection"""
-    try:
-        conn = mysql.connector.connect(
-            host=DB_HOST,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            database=DB_NAME
-        )
-        return conn
-    except Error as e:
-        st.error(f"❌ Database Connection Error: {e}")
-        return None
-
-def create_users_table():
-    """Create users table if it doesn't exist"""
-    try:
-        conn = get_db_connection()
-        if conn is None:
-            return False
-        cursor = conn.cursor()
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS users (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                username VARCHAR(255) UNIQUE NOT NULL,
-                email VARCHAR(255) UNIQUE NOT NULL,
-                password VARCHAR(255) NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
-        conn.commit()
-        cursor.close()
-        conn.close()
-        return True
-    except Error as e:
-        st.error(f"❌ Error creating table: {e}")
-        return False
-
-def register_user(username, email, password, confirm_password):
-    """Register a new user"""
-    # Validation
-    if not username or not email or not password:
-        st.warning("⚠️ Please fill all fields")
-        return False
-    
-    if len(username) < 3:
-        st.warning("⚠️ Username must be at least 3 characters long")
-        return False
-    
-    if len(password) < 6:
-        st.warning("⚠️ Password must be at least 6 characters long")
-        return False
-    
-    if password != confirm_password:
-        st.warning("⚠️ Passwords do not match")
-        return False
-    
-    # Email validation
-    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    if not re.match(email_pattern, email):
-        st.warning("⚠️ Please enter a valid email address")
-        return False
-    
-    try:
-        conn = get_db_connection()
-        if conn is None:
-            return False
-        
-        cursor = conn.cursor()
-        insert_query = "INSERT INTO users (username, email, password) VALUES (%s, %s, %s)"
-        cursor.execute(insert_query, (username, email, password))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        
-        # Success animation
-        with st.spinner(''):
-            time.sleep(1)
-        
-        return True
-    except mysql.connector.errors.IntegrityError as e:
-        if "username" in str(e).lower():
-            st.error("❌ Username already exists")
-        elif "email" in str(e).lower():
-            st.error("❌ Email already registered")
-        else:
-            st.error(f"❌ Registration error: {e}")
-        return False
-    except Error as e:
-        st.error(f"❌ Database error: {e}")
-        return False
-
-def login_user(username, password):
-    """Authenticate user login"""
-    if not username or not password:
-        st.warning("⚠️ Please enter username and password")
-        return False
-    
-    try:
-        conn = get_db_connection()
-        if conn is None:
-            return False
-        
-        cursor = conn.cursor()
-        query = "SELECT id, username FROM users WHERE username = %s AND password = %s"
-        cursor.execute(query, (username, password))
-        result = cursor.fetchone()
-        
-        cursor.close()
-        conn.close()
-        
-        if result:
-            return True
-        else:
-            st.error("❌ Invalid username or password")
-            return False
-    except Error as e:
-        st.error(f"❌ Login error: {e}")
-        return False
-
-def get_user_count():
-    """Get total number of registered users"""
-    try:
-        conn = get_db_connection()
-        if conn is None:
-            return 0
-        cursor = conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM users")
-        count = cursor.fetchone()[0]
-        cursor.close()
-        conn.close()
-        return count
-    except Error:
-        return 0
-
-# Main Application
-def main():
-    # Create users table on app startup
-    create_users_table()
-    
-    # Header
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.markdown("<h1 style='text-align: center; color: #667eea;'>🔐 Secure Auth</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: #666;'>Login or Register to Continue</p>", unsafe_allow_html=True)
-    
-    st.markdown("---")
-    
-    # Sidebar for switching modes
-    with st.sidebar:
-        st.markdown("### 📋 Navigation")
-        mode = st.radio("Choose an option:", ["🔑 Login", "📝 Register"], key="auth_mode_radio")
-        
-        # Show stats
-        st.markdown("---")
-        st.markdown("### 📊 Stats")
-        user_count = get_user_count()
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric("Total Users", user_count)
-        with col2:
-            st.metric("Status", "Online" if st.session_state.logged_in else "Offline")
-    
-    # Main content area
-    if st.session_state.logged_in:
-        # Header Navigation
-        col1, col2, col3, col4, col5 = st.columns([1, 1, 1, 1, 1])
-        with col1:
-            if st.button("🏠 Home", use_container_width=True, key="nav_home"):
-                st.session_state.page = "home"
-        with col2:
-            if st.button("👤 Profile", use_container_width=True, key="nav_profile"):
-                st.session_state.page = "profile"
-        with col3:
-            if st.button("📊 Dashboard", use_container_width=True, key="nav_dashboard"):
-                st.session_state.page = "dashboard"
-        with col4:
-            if st.button("⚙️ Settings", use_container_width=True, key="nav_settings"):
-                st.session_state.page = "settings"
-        with col5:
-            if st.button("🚪 Logout", use_container_width=True, key="logout_btn"):
-                st.session_state.logged_in = False
-                st.session_state.username = None
-                st.success("✅ Logged out successfully!")
-                time.sleep(1)
-                st.rerun()
-        
-        st.markdown("---")
-        
-        # Initialize page state
-        if 'page' not in st.session_state:
-            st.session_state.page = "home"
-        
-        # HOME PAGE
-        if st.session_state.page == "home":
-            st.markdown(f"""
-            <div style='text-align: center; padding: 30px;'>
-                <h1 style='color: #667eea; font-size: 48px;'>Welcome Back! 👋</h1>
-                <h2 style='color: #764ba2;'>{st.session_state.username}</h2>
-                <p style='font-size: 18px; color: #666;'>You are now authenticated and can access all features</p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            st.balloons()
-            
-            # Feature Cards
-            st.markdown("### 🌟 Featured Services")
-            col1, col2, col3 = st.columns(3)
-            
-            with col1:
-                st.markdown("""
-                <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                            padding: 20px; border-radius: 10px; text-align: center; color: white;'>
-                    <h3>📚 Learning Hub</h3>
-                    <p>Access educational resources and tutorials</p>
-                    <button style='background-color: white; color: #667eea; padding: 10px 20px; 
-                                   border: none; border-radius: 5px; cursor: pointer; font-weight: bold;'>
-                        Explore
-                    </button>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col2:
-                st.markdown("""
-                <div style='background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-                            padding: 20px; border-radius: 10px; text-align: center; color: white;'>
-                    <h3>🎯 Tasks & Projects</h3>
-                    <p>Manage your daily tasks and projects efficiently</p>
-                    <button style='background-color: white; color: #f5576c; padding: 10px 20px; 
-                                   border: none; border-radius: 5px; cursor: pointer; font-weight: bold;'>
-                        View Tasks
-                    </button>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col3:
-                st.markdown("""
-                <div style='background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-                            padding: 20px; border-radius: 10px; text-align: center; color: white;'>
-                    <h3>🔔 Notifications</h3>
-                    <p>Stay updated with real-time notifications</p>
-                    <button style='background-color: white; color: #00f2fe; padding: 10px 20px; 
-                                   border: none; border-radius: 5px; cursor: pointer; font-weight: bold;'>
-                        Check Now
-                    </button>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            st.markdown("---")
-            
-            # Quick Stats
-            st.markdown("### 📈 Your Activity")
-            col1, col2, col3, col4 = st.columns(4)
-            
-            with col1:
-                st.metric("Total Sessions", "24", "+3 this week")
-            with col2:
-                st.metric("Tasks Completed", "156", "+12 this month")
-            with col3:
-                st.metric("Learning Hours", "48", "+5 this week")
-            with col4:
-                st.metric("Achievements", "12", "+2 new")
-            
-            st.markdown("---")
-            
-            # Recent Activity
-            st.markdown("### 📝 Recent Activity")
-            activities = [
-                {"emoji": "✅", "activity": "Completed Python Basics Course", "time": "2 hours ago"},
-                {"emoji": "📝", "activity": "Submitted Project Assignment", "time": "5 hours ago"},
-                {"emoji": "🏆", "activity": "Earned 'Expert Developer' Badge", "time": "1 day ago"},
-                {"emoji": "💬", "activity": "Commented on Discussion Forum", "time": "2 days ago"},
-            ]
-            
-            for activity in activities:
-                st.info(f"{activity['emoji']} {activity['activity']} • {activity['time']}")
-        
-        # PROFILE PAGE
-        elif st.session_state.page == "profile":
-            st.markdown(f"""
-            <div style='text-align: center; padding: 20px;'>
-                <h1 style='color: #667eea;'>👤 User Profile</h1>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            col1, col2 = st.columns([1, 2])
-            
-            with col1:
-                st.markdown("""
-                <div style='text-align: center;'>
-                    <div style='width: 150px; height: 150px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                                border-radius: 50%; margin: auto; display: flex; align-items: center; justify-content: center;
-                                font-size: 60px;'>
-                        👤
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col2:
-                st.markdown(f"""
-                <div style='padding: 20px;'>
-                    <h2>Username</h2>
-                    <p style='font-size: 18px; color: #667eea;'><strong>{st.session_state.username}</strong></p>
-                    <h2>Account Status</h2>
-                    <p style='font-size: 18px; color: green;'>✅ <strong>Active</strong></p>
-                    <h2>Member Since</h2>
-                    <p style='font-size: 18px;'><strong>{datetime.now().strftime('%B %d, %Y')}</strong></p>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            st.markdown("---")
-            
-            st.markdown("### 📋 Profile Information")
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                email_display = st.text_input("📧 Email", value="user@example.com", disabled=True)
-            with col2:
-                phone_display = st.text_input("📱 Phone", value="+1 (555) 123-4567", disabled=True)
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                country = st.text_input("🌍 Country", value="United States", disabled=True)
-            with col2:
-                city = st.text_input("🏙️ City", value="New York", disabled=True)
-            
-            st.markdown("---")
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.button("✏️ Edit Profile", use_container_width=True):
-                    st.info("Edit profile feature coming soon!")
-            with col2:
-                if st.button("🔐 Change Password", use_container_width=True):
-                    st.warning("Password change feature coming soon!")
-        
-        # DASHBOARD PAGE
-        elif st.session_state.page == "dashboard":
-            st.markdown(f"""
-            <div style='text-align: center; padding: 20px;'>
-                <h1 style='color: #667eea;'>📊 Dashboard</h1>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # Dashboard stats
-            col1, col2, col3, col4 = st.columns(4)
-            
-            with col1:
-                st.markdown("""
-                <div style='background: #E8EAF6; padding: 20px; border-radius: 10px; text-align: center;'>
-                    <h3 style='color: #667eea;'>📊 Total Views</h3>
-                    <h1 style='color: #667eea; font-size: 36px;'>2,547</h1>
-                    <p style='color: green;'>↑ 12% from last month</p>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col2:
-                st.markdown("""
-                <div style='background: #FCE4EC; padding: 20px; border-radius: 10px; text-align: center;'>
-                    <h3 style='color: #f5576c;'>👥 New Users</h3>
-                    <h1 style='color: #f5576c; font-size: 36px;'>384</h1>
-                    <p style='color: green;'>↑ 8% from last month</p>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col3:
-                st.markdown("""
-                <div style='background: #E0F2F1; padding: 20px; border-radius: 10px; text-align: center;'>
-                    <h3 style='color: #00f2fe;'>💰 Revenue</h3>
-                    <h1 style='color: #00f2fe; font-size: 36px;'>$12.5K</h1>
-                    <p style='color: green;'>↑ 23% from last month</p>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            with col4:
-                st.markdown("""
-                <div style='background: #FFF3E0; padding: 20px; border-radius: 10px; text-align: center;'>
-                    <h3 style='color: #FF9800;'>⭐ Rating</h3>
-                    <h1 style='color: #FF9800; font-size: 36px;'>4.8</h1>
-                    <p style='color: green;'>↑ 0.3 from last month</p>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            st.markdown("---")
-            
-            # Chart data
-            st.markdown("### 📈 Performance Overview")
-            
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.markdown("#### Weekly Activity")
-                activity_data = {
-                    "Day": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-                    "Users": [120, 150, 180, 160, 200, 140, 100]
-                }
-                st.line_chart(data=activity_data, x="Day", y="Users")
-            
-            with col2:
-                st.markdown("#### Category Distribution")
-                category_data = {
-                    "Category": ["Product A", "Product B", "Product C", "Product D"],
-                    "Sales": [45, 30, 20, 5]
-                }
-                st.bar_chart(data=category_data, x="Category", y="Sales")
-        
-        # SETTINGS PAGE
-        elif st.session_state.page == "settings":
-            st.markdown(f"""
-            <div style='text-align: center; padding: 20px;'>
-                <h1 style='color: #667eea;'>⚙️ Settings</h1>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            st.markdown("### 🔔 Notifications")
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                st.write("Email Notifications")
-            with col2:
-                st.toggle("Enable", value=True, key="email_notif")
-            
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                st.write("Push Notifications")
-            with col2:
-                st.toggle("Enable", value=True, key="push_notif")
-            
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                st.write("SMS Alerts")
-            with col2:
-                st.toggle("Enable", value=False, key="sms_notif")
-            
-            st.markdown("---")
-            
-            st.markdown("### 🎨 Appearance")
-            theme = st.selectbox("Theme", ["Light", "Dark", "Auto"], key="theme_select")
-            st.info(f"Selected theme: {theme}")
-            
-            st.markdown("---")
-            
-            st.markdown("### 🔐 Privacy & Security")
-            col1, col2 = st.columns([3, 1])
-            with col1:
-                st.write("Two-Factor Authentication")
-            with col2:
-                st.toggle("Enable", value=False, key="2fa_toggle")
-            
-            st.markdown("---")
-            
-            st.markdown("### 💾 Data Management")
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.button("📥 Download My Data", use_container_width=True):
-                    st.success("✅ Download started!")
-            with col2:
-                if st.button("🗑️ Delete Account", use_container_width=True):
-                    st.error("❌ Account deletion requires confirmation")
-            
-            st.markdown("---")
-            
-            if st.button("💾 Save Settings", use_container_width=True):
-                st.success("✅ Settings saved successfully!")
-    
-    else:
-        # Login/Register forms
-        if "🔑 Login" in mode:
-            st.subheader("🔑 User Login")
-            with st.form("login_form", clear_on_submit=True):
-                username = st.text_input("👤 Username", placeholder="Enter your username")
-                password = st.text_input("🔒 Password", type="password", placeholder="Enter your password")
-                
-                col1, col2 = st.columns(2)
-                with col1:
-                    submit_btn = st.form_submit_button("🔓 Login", use_container_width=True)
-                with col2:
-                    st.form_submit_button("Clear", use_container_width=True)
-            
-            if submit_btn:
-                with st.spinner('🔍 Verifying credentials...'):
-                    time.sleep(1)
-                    if login_user(username, password):
-                        st.session_state.logged_in = True
-                        st.session_state.username = username
-                        st.success("✅ Login Successful!")
-                        st.balloons()
-                        time.sleep(1)
-                        st.rerun()
-        
-        else:  # Register mode
-            st.subheader("📝 Create New Account")
-            with st.form("register_form", clear_on_submit=True):
-                username = st.text_input("👤 Username", placeholder="Choose a username (min 3 chars)")
-                email = st.text_input("📧 Email", placeholder="Enter your email address")
-                password = st.text_input("🔒 Password", type="password", placeholder="Enter password (min 6 chars)")
-                confirm_password = st.text_input("🔐 Confirm Password", type="password", placeholder="Confirm your password")
-                
-                # Password strength indicator
-                if password:
-                    strength = len(password)
-                    if strength < 6:
-                        st.warning("⚠️ Password is too weak")
-                    elif strength < 10:
-                        st.info("ℹ️ Password strength: Medium")
-                    else:
-                        st.success("✅ Password strength: Strong")
-                
-                col1, col2 = st.columns(2)
-                with col1:
-                    submit_btn = st.form_submit_button("✍️ Register", use_container_width=True)
-                with col2:
-                    st.form_submit_button("Clear", use_container_width=True)
-            
-            if submit_btn:
-                with st.spinner('📝 Creating account...'):
-                    time.sleep(1)
-                    if register_user(username, email, password, confirm_password):
-                        col1, col2, col3 = st.columns([1, 1, 1])
-                        with col2:
-                            st.success("✅ Registration Successful!")
-                            st.balloons()
-                        st.info("💡 You can now login with your credentials")
-                        time.sleep(2)
-                        st.rerun()
-    
-    # Footer
-    st.markdown("---")
-    st.markdown("""
-    <div style='text-align: center; color: #999; font-size: 12px;'>
-        <p>🔐 Secure Authentication System | Built with Streamlit & MySQL</p>
-        <p>© 2026 All Rights Reserved</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-if __name__ == "__main__":
-    main()
+'''data = {
+    'Name': ['Anurag', 'Sumit', 'Rohit'],
+    'Age': [21, 22, 20],
+    'Course': ['B.Tech', 'M.Tech', 'BBA']
+}
+st.table(data)
+ '''
+st.sidebar.header("this is sidebar")
+option=st.sidebar.selectbox("choose page",["page1","page2","page3"])
+st.sidebar.write("selected",option)
